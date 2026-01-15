@@ -23,6 +23,9 @@
 - Make sure that this package is in the workspace of both the devices.
 - Now, note that the TCP client should reach out for a client in another device, so you should make sure that the IPv4 address is set correctly in the main.hpp file. The name of the macro is **sendaddr**
 
+### regarding the compilation
+- All files written here, irrespective of ROS, get compiled using colcon build, and can be used normally with ros2 run.
+
 ### what to run where
 - the main.cpp file[refer to "what it has"] should be run on your device
 - The camctl2.c file should be run on the device where the camera is attached.
