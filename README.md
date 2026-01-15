@@ -30,6 +30,8 @@
 - the main.cpp file[refer to "what it has"] should be run on your device
 - The camctl2.c file should be run on the device where the camera is attached.
 
+check
+
 
 
 
