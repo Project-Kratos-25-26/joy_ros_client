@@ -38,13 +38,12 @@
 #define x_index 5
 #define y_index 15
 #define offset 4
-#define videofile "/dev/video6"
 //server constants constants
 //-------------------------------------------------------------------------------
 #define PORT "3490" 
 #define BACKLOG 10
 #define MAXBUFLEN 100
-
+const char* obsbot_name = "OBSBOT Tiny 2 Lite: OBSBOT Tiny"; //name of the device we wanna find 
 
 //server struct definition
 //-------------------------------------------------------------------------------
@@ -163,6 +162,27 @@ int getY(char * buf) {
     return atoi(ss);
 }
 
+//detecting and finding cam descriptor
+//-------------------------------------------------------------------------------
+int get_device(char* videofile) {
+    char device_path[20];
+    int camfd;
+    struct v4l2_capability cap;
+    for(int i=0; i< 64; i++) {
+        snprintf(device_path,sizeof(device_path),"/dev/video%d",i);
+        if((camfd = open(device_path,O_RDONLY | O_NONBLOCK)) == -1) continue;
+        if(ioctl(camfd,VIDIOC_QUERYCAP,&cap) == 0) {
+            if(!strncmp(cap.card,obsbot_name,sizeof(obsbot_name))) {
+                if(cap.device_caps & V4L2_CAP_VIDEO_CAPTURE) {
+                    strncpy(videofile,device_path,sizeof(device_path));
+                    return 0;
+                }
+            }
+        } 
+    }
+    return -1;
+}
+
 //the main function
 //-------------------------------------------------------------------------------
 int main(void) {
@@ -185,7 +205,9 @@ int main(void) {
     // pan_speed_control.id = pan_speed_op; //unused
     // tilt_speed_control.id = tilt_speed_op; //unused
 
-
+    char videofile[20] = {0};
+    if(get_device(videofile) == -1) perror("get_device");
+    printf("Obsbot found at %s \n",videofile);
     cam = open(videofile,O_RDWR);
     //-------------------------------------------------------------------------------
     //initialisation routine to see if cam is working and setting speed
